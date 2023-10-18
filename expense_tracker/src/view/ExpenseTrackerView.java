@@ -19,6 +19,9 @@ public class ExpenseTrackerView extends JFrame {
   private JFormattedTextField amountField;
   private JTextField categoryField;
   private DefaultTableModel model;
+  private JButton applyFilterBtn;
+  private JComboBox<String> filterTypeComboBox;
+  private JTextField filterValueField;
   
 
   public ExpenseTrackerView() {
@@ -29,6 +32,10 @@ public class ExpenseTrackerView extends JFrame {
     this.model = new DefaultTableModel(columnNames, 0);
 
     addTransactionBtn = new JButton("Add Transaction");
+    applyFilterBtn = new JButton("Apply Filter");
+    String[] filterTypes = {"Amount", "Category"};
+    filterTypeComboBox = new JComboBox<>(filterTypes);
+    filterValueField = new JTextField(10);
 
     // Create UI components
     JLabel amountLabel = new JLabel("Amount:");
@@ -54,6 +61,13 @@ public class ExpenseTrackerView extends JFrame {
   
     JPanel buttonPanel = new JPanel();
     buttonPanel.add(addTransactionBtn);
+
+    // JPanel buttonPanel = new JPanel();
+    buttonPanel.add(new JLabel("Filter Type:"));
+    buttonPanel.add(filterTypeComboBox);
+    buttonPanel.add(new JLabel("Filter Value:"));
+    buttonPanel.add(filterValueField);
+    buttonPanel.add(applyFilterBtn);
   
     // Add panels to frame
     add(inputPanel, BorderLayout.NORTH);
@@ -61,7 +75,7 @@ public class ExpenseTrackerView extends JFrame {
     add(buttonPanel, BorderLayout.SOUTH);
   
     // Set frame properties
-    setSize(400, 300);
+    setSize(700, 500);
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     setVisible(true);
   
