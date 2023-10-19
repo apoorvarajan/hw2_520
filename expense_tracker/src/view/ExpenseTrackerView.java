@@ -4,6 +4,7 @@ import javax.swing.*;
 import javax.swing.JFormattedTextField.AbstractFormatterFactory;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.table.DefaultTableCellRenderer;
 
 import controller.InputValidation;
 import controller.ExpenseTrackerController;
@@ -150,27 +151,38 @@ public class ExpenseTrackerView extends JFrame {
     this.categoryField = categoryField;
   }
   public void highlightFilteredRows(List<Transaction> filteredTransactions) {
-    int rowCount = model.getRowCount();
-    for (int i = 0; i < rowCount-1; i++) {
-        Transaction currentTransaction = getTransactionAtRow(i);
-        boolean isFiltered = isTransactionInList(currentTransaction, filteredTransactions);
+    transactionsTable.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            Transaction currentTransaction = getTransactionAtRow(row);
+            boolean isFiltered = isTransactionInList(currentTransaction, filteredTransactions);
 
-        if (isFiltered) {
-            // Highlight the row
-            for (int j = 0; j < transactionsTable.getColumnCount(); j++) {
-              transactionsTable.getCellRenderer(i, j).getTableCellRendererComponent(transactionsTable, null, false, false, i, j)
-                      .setBackground(Color.red);
-          }
-        } else {
-            // Reset row color
-            transactionsTable.getCellRenderer(i, 0).getTableCellRendererComponent(transactionsTable, null, false, false, i, 0)
-                    .setBackground(transactionsTable.getBackground());
+            if (isFiltered) {
+                c.setBackground(new Color(173, 255, 168)); // Light green
+            } else {
+                c.setBackground(table.getBackground());
+            }
+
+            return c;
         }
-    }
+    });
+
+    transactionsTable.repaint(); // Repaint the table to apply the cell rendering changes
 }
 private Transaction getTransactionAtRow(int row) {
-  double amount = (double) model.getValueAt(row, 1);
-  String category = (String) model.getValueAt(row, 2);
+  Object amountObj = model.getValueAt(row, 1);
+    Object categoryObj = model.getValueAt(row, 2);
+
+    // Check for null values
+    if (amountObj == null || categoryObj == null) {
+        return null;  // Return null if any required values are null
+    }
+
+    // Convert values to appropriate types
+    double amount = (double) amountObj;
+    String category = (String) categoryObj;
+
   return new Transaction(amount, category);
 }
 public void setController(ExpenseTrackerController controller){
