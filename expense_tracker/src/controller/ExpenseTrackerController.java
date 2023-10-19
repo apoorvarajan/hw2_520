@@ -8,6 +8,10 @@ import java.util.List;
 
 import model.ExpenseTrackerModel;
 import model.Transaction;
+import model.AmountFilter;
+import model.CategoryFilter;
+import model.TransactionFilter;
+import view.ExpenseTrackerView;
 public class ExpenseTrackerController {
   
   private ExpenseTrackerModel model;
@@ -46,4 +50,29 @@ public class ExpenseTrackerController {
   }
   
   // Other controller methods
+
+  public void applyFilter(String filterType, String filterValue) {
+    List<Transaction> filteredTransactions;
+    TransactionFilter filter;
+
+    switch (filterType.toLowerCase()) {
+        case "amount":
+            double amountToFilter = Double.parseDouble(filterValue);
+            filter = new AmountFilter(amountToFilter);
+            filteredTransactions = filter.filter(model.getTransactions());
+            break;
+
+        case "category":
+            filter = new CategoryFilter(filterValue);
+            filteredTransactions = filter.filter(model.getTransactions());
+            break;
+
+        default:
+            // Handle unsupported filter type
+            return;
+    }
+
+    // Highlight the rows in the view
+    view.highlightFilteredRows(filteredTransactions);
+  }
 }

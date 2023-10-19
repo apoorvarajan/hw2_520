@@ -3,8 +3,10 @@ package view;
 import javax.swing.*;
 import javax.swing.JFormattedTextField.AbstractFormatterFactory;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
 
 import controller.InputValidation;
+import controller.ExpenseTrackerController;
 
 import java.awt.*;
 import java.text.NumberFormat;
@@ -22,6 +24,7 @@ public class ExpenseTrackerView extends JFrame {
   private JButton applyFilterBtn;
   private JComboBox<String> filterTypeComboBox;
   private JTextField filterValueField;
+  private ExpenseTrackerController controller;
   
 
   public ExpenseTrackerView() {
@@ -68,6 +71,8 @@ public class ExpenseTrackerView extends JFrame {
     buttonPanel.add(new JLabel("Filter Value:"));
     buttonPanel.add(filterValueField);
     buttonPanel.add(applyFilterBtn);
+
+    applyFilterBtn.addActionListener(e -> applyFilter());
   
     // Add panels to frame
     add(inputPanel, BorderLayout.NORTH);
@@ -110,6 +115,11 @@ public class ExpenseTrackerView extends JFrame {
   public JButton getAddTransactionBtn() {
     return addTransactionBtn;
   }
+  private void applyFilter() {
+    String filterType = (String) filterTypeComboBox.getSelectedItem();
+    String filterValue = filterValueField.getText();
+    controller.applyFilter(filterType, filterValue);
+}
   public DefaultTableModel getTableModel() {
     return model;
   }
@@ -139,4 +149,45 @@ public class ExpenseTrackerView extends JFrame {
   public void setCategoryField(JTextField categoryField) {
     this.categoryField = categoryField;
   }
+  public void highlightFilteredRows(List<Transaction> filteredTransactions) {
+    int rowCount = model.getRowCount();
+    for (int i = 0; i < rowCount-1; i++) {
+        Transaction currentTransaction = getTransactionAtRow(i);
+        boolean isFiltered = isTransactionInList(currentTransaction, filteredTransactions);
+
+        if (isFiltered) {
+            // Highlight the row
+            for (int j = 0; j < transactionsTable.getColumnCount(); j++) {
+              transactionsTable.getCellRenderer(i, j).getTableCellRendererComponent(transactionsTable, null, false, false, i, j)
+                      .setBackground(Color.red);
+          }
+        } else {
+            // Reset row color
+            transactionsTable.getCellRenderer(i, 0).getTableCellRendererComponent(transactionsTable, null, false, false, i, 0)
+                    .setBackground(transactionsTable.getBackground());
+        }
+    }
+}
+private Transaction getTransactionAtRow(int row) {
+  double amount = (double) model.getValueAt(row, 1);
+  String category = (String) model.getValueAt(row, 2);
+  return new Transaction(amount, category);
+}
+public void setController(ExpenseTrackerController controller){
+  this.controller=controller;
+}
+private boolean isTransactionInList(Transaction transaction, List<Transaction> transactionList) {
+  // Iterate through the list and check for a match
+  for (Transaction t : transactionList) {
+      if (areTransactionsEqual(transaction, t)) {
+          return true; // Found a match
+      }
+  }
+  return false; // No match found
+}
+private boolean areTransactionsEqual(Transaction t1, Transaction t2) {
+  // Implement your custom logic to compare transactions for equality
+  return Double.compare(t1.getAmount(), t2.getAmount()) == 0 &&
+         t1.getCategory().equals(t2.getCategory());
+}
 }

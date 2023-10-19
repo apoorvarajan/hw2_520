@@ -16,6 +16,8 @@ public class ExpenseTrackerApp {
     ExpenseTrackerView view = new ExpenseTrackerView();
     ExpenseTrackerController controller = new ExpenseTrackerController(model, view);
 
+    view.setController(controller);
+
     // Initialize view
     view.setVisible(true);
 
