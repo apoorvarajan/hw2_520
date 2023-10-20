@@ -26,9 +26,19 @@ public class ExpenseTrackerView extends JFrame {
   private JComboBox<String> filterTypeComboBox;
   private JTextField filterValueField;
   private ExpenseTrackerController controller;
+  private List<Integer> filteredTransactions;
+ 
   
 
-  public ExpenseTrackerView() {
+  public List<Integer> getFilteredTransactions() {
+	return filteredTransactions;
+}
+
+public void setFilteredTransactions(List<Integer> filteredTransactions) {
+	this.filteredTransactions = filteredTransactions;
+}
+
+public ExpenseTrackerView() {
     setTitle("Expense Tracker"); // Set title
     setSize(600, 400); // Make GUI larger
 
@@ -54,6 +64,25 @@ public class ExpenseTrackerView extends JFrame {
 
     // Create table
     transactionsTable = new JTable(model);
+    
+    transactionsTable.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            if(getFilteredTransactions() != null) {
+	            boolean isFiltered = getFilteredTransactions().contains(row);
+	            System.out.println("render "+ isFiltered);
+	            if (isFiltered) {
+	                c.setBackground(new Color(173, 255, 168)); // Light green
+	            } else {
+	                c.setBackground(table.getBackground());
+	            }
+            }
+
+            return c;
+        }
+    });
+
   
     // Layout components
     JPanel inputPanel = new JPanel();
@@ -150,26 +179,7 @@ public class ExpenseTrackerView extends JFrame {
   public void setCategoryField(JTextField categoryField) {
     this.categoryField = categoryField;
   }
-  public void highlightFilteredRows(List<Transaction> filteredTransactions) {
-    transactionsTable.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
-        @Override
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-            Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-            Transaction currentTransaction = getTransactionAtRow(row);
-            boolean isFiltered = isTransactionInList(currentTransaction, filteredTransactions);
 
-            if (isFiltered) {
-                c.setBackground(new Color(173, 255, 168)); // Light green
-            } else {
-                c.setBackground(table.getBackground());
-            }
-
-            return c;
-        }
-    });
-
-    transactionsTable.repaint(); // Repaint the table to apply the cell rendering changes
-}
 private Transaction getTransactionAtRow(int row) {
   Object amountObj = model.getValueAt(row, 1);
     Object categoryObj = model.getValueAt(row, 2);

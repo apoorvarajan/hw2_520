@@ -52,7 +52,7 @@ public class ExpenseTrackerController {
   // Other controller methods
 
   public void applyFilter(String filterType, String filterValue) {
-    List<Transaction> filteredTransactions;
+    List<Integer> filteredTransactions;
     TransactionFilter filter;
 
     switch (filterType.toLowerCase()) {
@@ -71,8 +71,7 @@ public class ExpenseTrackerController {
             // Handle unsupported filter type
             return;
     }
-
-    // Highlight the rows in the view
-    view.highlightFilteredRows(filteredTransactions);
+    view.setFilteredTransactions(filteredTransactions);
+    refresh();
   }
 }

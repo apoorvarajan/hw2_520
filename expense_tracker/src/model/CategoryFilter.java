@@ -2,6 +2,7 @@ package model;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class CategoryFilter implements TransactionFilter {
 
@@ -12,9 +13,10 @@ public class CategoryFilter implements TransactionFilter {
     }
 
     @Override
-    public List<Transaction> filter(List<Transaction> transactions) {
-        return transactions.stream()
-                .filter(transaction -> transaction.getCategory().equalsIgnoreCase(categoryToFilter))
+    public List<Integer> filter(List<Transaction> transactions) {
+        return IntStream.range(0, transactions.size())
+                .filter(i -> transactions.get(i).getCategory().equalsIgnoreCase(categoryToFilter))
+                .boxed()
                 .collect(Collectors.toList());
     }
 }
